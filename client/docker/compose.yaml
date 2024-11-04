@@ -1,0 +1,9 @@
+services:
+    among-pop:
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+        image: amongpop
+        ports:
+            - '3000:3000'
+        container_name: amongpop

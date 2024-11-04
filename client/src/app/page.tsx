@@ -1,14 +1,23 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { MouseEvent } from 'react'
+import { useEffect } from 'react'
 
 export default function Home() {
     const [clickCount, setClickCount] = useState(0)
     const [mouseState, setMouseState] = useState(false) // false: up, true: down
-    const audioPop = new Audio('/pop.mp3')
-    const audioImposter = new Audio('/imposter.mp3')
+    const audioPop = useRef<HTMLAudioElement | null>(null)
+    const audioImposter = useRef<HTMLAudioElement | null>(null)
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            // Client-side only code
+            audioPop.current = new Audio('/pop.mp3')
+            audioImposter.current = new Audio('/imposter.mp3')
+        }
+    }, [])
 
     const mouseDownHandler = (e: MouseEvent) => {
         if (e.button !== 0) return
@@ -16,8 +25,10 @@ export default function Home() {
         setMouseState(true)
 
         // interrupt the audio if it's playing
-        audioPop.pause()
-        audioPop.currentTime = 0
+        if (audioPop.current) {
+            audioPop.current.pause()
+            audioPop.current.currentTime = 0
+        }
     }
 
     const mouseUpHandler = (e: MouseEvent) => {
@@ -28,9 +39,9 @@ export default function Home() {
         }
 
         if (clickCount % 100 === 0) {
-            audioImposter.play()
+            audioImposter.current?.play()
         } else {
-            audioPop.play()
+            audioPop.current?.play()
         }
 
         setMouseState(false)
